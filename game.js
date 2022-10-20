@@ -135,7 +135,7 @@ const ghostJump = {
         
     }},
     update: function() {
-            this.frame = frames % 1 == 0 ? 1:0;
+            this.frame += frames % 1 == 0 ? 1:0;
             
             }
         }
