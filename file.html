@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+
+
+</head>
+<body>
+
+<script>
+ const createBall = (top, right) => {
+    const $ball = document.createElement("div");
+    $ball.classList.add("ball");
+    $ball.style.top = top + "px";
+    $ball.style.left = right - 25 + "px";
+    document.body.appendChild($ball);
+    return $ball
+}
+
+  const initFalling = ball => {
+  const ballHeight = 100
+  const acceleration = 9.8 / 60;
+  const { innerHeight } = window;
+  let fallingSpeed = 0;
+  const animateFall = () => {
+    const top = parseInt(ball.style.top);
+    const newTop = `${top + fallingSpeed}px`;
+    /* To break the fall, when the ball is near the surface */
+    if (parseInt(newTop) >= innerHeight - ballHeight) {
+      ball.style.top = this.innerHeight - ballHeight + "px";
+      ball.style.background = "red";
+      return null;
+    }
+    
+    /* Else set the top to the new value */
+    ball.style.top = newTop;
+    fallingSpeed = fallingSpeed + acceleration;
+    requestAnimationFrame(animateFall);
+  };
+  requestAnimationFrame(animateFall);
+};
+
+    const onClickListener = event => {
+        const {x, y} = event;
+        initFalling(createBall (y, x));
+
+    }
+
+    document.addEventListener("click", onClickListener)
+
+
+
+</script>
+
+
+
+
+
+</body>
+</html>
