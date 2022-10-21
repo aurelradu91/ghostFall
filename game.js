@@ -96,14 +96,16 @@ const ghostIntro = {
 
     draw: function() {
         if(state.current == state.game){
-        if(this.x < 510){let ghostIntro = this.animation[this.frame];
-        ctx.drawImage(sprite, ghostIntro.sX, ghostIntro.sY, this.w, this.h, this.x++, this.y, this.w, this.h)}
-        else {let ghostIntro = this.animation[this.frame];
-            ctx.drawImage(sprite, ghostIntro.sX, ghostIntro.sY, this.w, this.h, this.x, this.y, this.w, this.h)}
+        {let ghostIntro = this.animation[this.frame];
+        ctx.drawImage(sprite, ghostIntro.sX, ghostIntro.sY, this.w, this.h, this.x, this.y, this.w, this.h)}
     }},
-    update: function() {
+    intro: function() {
+        if(state.current == state.game){
         this.frame += frames % 9 == 0 ? 1:0;
         this.frame = this.frame % this.animation.length;
+        this.x += frames % 1 == 0 ? 4:0
+        if(this.x >= 510){this.x = 510}}
+
     }
 }
 
@@ -130,16 +132,18 @@ const ghostJump = {
         if(ghostIntro.x == 510){
         ghostIntro.draw =  function(){};
         let ghostJump = this.animation[this.frame];
-        ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y++, this.w, this.h)
+        ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x , this.y, this.w, this.h)}
 
         
-    }},
-    update: function() {
-            if (this.frame < 7)
-            this.frame += frames % 1 == 0 ? 1:0;
+    },
+    intro: function() {
+            if(this.frame < 7){
+                this.frame += frames % 2 == 0 ? 1:0}
+            
             
             }
         }
+
 
 
 
@@ -300,18 +304,25 @@ function draw(){
     eat2.draw();
 }
 
+function intro(){
+    ghostIntro.intro();
+    // ghostJump.intro();
+
+}
+
 // UPDATE 
 function update(){
-    ghostIntro.update();
-    ghostJump.update();
+
 
 }
 
 //LOOP
 function loop(){
-    frames++;
-    update();
+    // update()
     draw();
+    intro();
+    frames++;
+
 
     requestAnimationFrame(loop)
 }
