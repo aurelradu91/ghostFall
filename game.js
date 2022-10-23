@@ -96,14 +96,14 @@ const ghostIntro = {
 
     draw: function() {
         if(state.current == state.game){
-        {let ghostIntro = this.animation[this.frame];
+        let ghostIntro = this.animation[this.frame];
         ctx.drawImage(sprite, ghostIntro.sX, ghostIntro.sY, this.w, this.h, this.x, this.y, this.w, this.h)}
-    }},
+    },
     intro: function() {
         if(state.current == state.game){
         this.frame += frames % 9 == 0 ? 1:0;
         this.frame = this.frame % this.animation.length;
-        this.x += frames % 1 == 0 ? 4:0
+        this.x += frames % 1 == 0 ? 4:0;
         if(this.x >= 510){this.x = 510}}
 
     }
@@ -114,34 +114,66 @@ const ghostIntro = {
 const ghostJump = {
     animation : [ 
         {sX:1546, sY:0},
+        {sX:1546, sY:0},
+        {sX:1546, sY:0},
         {sX:1738, sY:0},
         {sX:1925, sY:0},
         {sX:2114, sY:0},
         {sX:1166, sY:203},
         {sX:1354, sY:203},
         {sX:1562, sY:203},
+        {sX:1562, sY:203}
     ],
     x : 510,
     y : 12,
-    w : 184,
+    w : 195,
     h : 196,
 
     frame : 0,
+
 
     draw: function() {
         if(ghostIntro.x == 510){
         ghostIntro.draw =  function(){};
         let ghostJump = this.animation[this.frame];
-        ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x , this.y, this.w, this.h)}
-
-        
-    },
-    intro: function() {
-            if(this.frame < 7){
-                this.frame += frames % 2 == 0 ? 1:0}
-            
-            
+        if(this.frame < 3) 
+         {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x , this.y, this.w, this.h)}
+        if (this.frame == 3)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y--, this.w, this.h)
+        }
+        if (this.frame == 4)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y--, this.w, this.h)
+        }
+        if (this.frame == 5)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y--, this.w, this.h)
+        }
+        if (this.frame == 6)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y--, this.w, this.h)
+        }
+        if (this.frame == 7)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y++, this.w, this.h)
+        }
+        if (this.frame == 8)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y++, this.w, this.h)
+        }
+        if (this.frame == 9)
+        {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x++ , this.y++, this.w, this.h)
             }
+        
+        }
+    }
+    
+    ,
+    intro: function() {
+        if(ghostIntro.x == 510){
+            if(this.frame < 9){
+                this.frame += frames % 12 == 0 ? 1:0;
+                this.frame = this.frame;
+};
+        if (this.frame == 9)  { 
+            this.frame = 9
+        }         
+        }}
         }
 
 
@@ -155,17 +187,31 @@ const ghostFall = {
         {sX:1753, sY:202},
     ],
 
-    x : 500,
-    y : 14,
+    x : 624,
+    y : 45,
     w: 185,
     h : 194,
 
     frame: 0,
 
     draw: function() {
-        let ghostFall = this.animation[this.frame];
-        ctx.drawImage(sprite, ghostFall.sX, ghostFall.sY, this.w, this.h, this.x, this.y, this.w, this.h)
-    }
+            if(ghostJump.y == 30){
+            ghostJump.draw =  function(){};
+
+            let ghostFall = this.animation[this.frame];
+            ctx.drawImage(sprite, ghostFall.sX, ghostFall.sY, this.w, this.h, this.x, this.y, this.w, this.h)
+    }},
+
+    update: function(){
+        if(ghostJump.y == 30){
+        ghostJump.draw =  function(){};
+        this.frame += frames% 5 == 0 ?1:0;
+        this.frame = this.frame % this.animation.length}
+        this.y += frames% 10 == 0 ?1:0;
+        console.log(this.y)
+        if(this.y == 125){this.y = 125}},
+    
+    
 
 }
 
@@ -295,8 +341,8 @@ function draw(){
     fg.draw();
     ghostIntro.draw();
     ghostJump.draw();
-    // ghostFall.draw();
-    ghostChute.draw();
+    ghostFall.draw();
+    // ghostChute.draw();
     gameStart.draw();
     gameOver.draw();
     // gamePannel.draw();
@@ -306,21 +352,21 @@ function draw(){
 
 function intro(){
     ghostIntro.intro();
-    // ghostJump.intro();
+    ghostJump.intro();
 
 }
 
 // UPDATE 
 function update(){
-
+    ghostFall.update()
 
 }
 
 //LOOP
 function loop(){
-    // update()
-    draw();
     intro();
+    update();
+    draw();
     frames++;
 
 
