@@ -4,16 +4,39 @@ const cvs = document.getElementById("ghost");
 
 const ctx = cvs.getContext("2d");
 
-//SOUND FX
+const actx = new AudioContext()
+
+//SOUND FX STEPS
 
 const stepsfx = new Audio();
 stepsfx.src = "./audio/steps.wav";
 
-const jumpy = new Audio();
-jumpy.src = "./audio/jump2.wav";
 
-const jumpy2 = new Audio();
-jumpy2.src = "./audio/jump2.wav";
+//SOUND FX JUMPS
+
+        async function getFile(){
+            const response = await fetch("./audio/jump2.wav");
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await actx.decodeAudioData(arrayBuffer)
+            return audioBuffer;
+        }
+
+
+        async function playSample() {
+            const sound = await getFile()
+            const sampleSource = actx.createBufferSource();
+            sampleSource.buffer = sound;
+            sampleSource.connect(actx.destination);
+            sampleSource.start();
+            return sampleSource;
+        }
+
+    window.addEventListener("load", getFile())
+    window.addEventListener("load", stepsfx)
+
+
+
+
 
 
 
@@ -31,8 +54,9 @@ sprite.src = "img/sprite.png";
 const state = {
     current: 0,
     getReady: 0,
-    game: 1,
-    over: 2,
+    intro: 1,
+    game: 2,
+    over: 3,
 }
 
 // CONTROL THE GAME
@@ -40,10 +64,15 @@ const state = {
 cvs.addEventListener("click", function(evt){
     switch(state.current){
         case state.getReady:
-            state.current = state.game;
+            state.current = state.intro;
+            break;
+        case state.intro:
+            state.current == state.intro;
             break;
         case state.game:
             ghostFall2.flap();
+            playSample();
+            ghostFall2.chute();
             // ghostJump()
             // ghostFlapp();
             // ghostBrella();
@@ -66,10 +95,19 @@ const bg = {
     y : 0,
     dW : 1344,
     dH : 392,
+    dy: 2,
 
     draw : function(){
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.dW, this.dH)
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y + this.dH, this.dW, this.dH)
+        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y + this.dH + this.dH, this.dW, this.dH)
+    },
+
+    update : function(){
+        if(state.current == state.game){
+           this.y = (this.y - this.dy) % this.dH;
+        }
+
     }
 }
 
@@ -117,17 +155,20 @@ const ghostIntro = {
     frame : 0,
 
     draw: function() {
-        if(state.current == state.game){
+        if(state.current == state.intro){
+        if (this.x == 510) return;
         let ghostIntro = this.animation[this.frame];
         ctx.drawImage(sprite, ghostIntro.sX, ghostIntro.sY, this.w, this.h, this.x, this.y, this.w, this.h)}
     },
     intro: function() {
-        if(state.current == state.game){
+        
+        if(state.current == state.intro){
         if(this.x < 500){stepsfx.play()};
         this.frame += frames % 9 == 0 ? 1:0;
         this.frame = this.frame % this.animation.length;
         this.x += frames % 1 == 0 ? 4:0;
-        if(this.x >= 510){this.x = 510}}
+        if(this.x >= 510) {this.x = 510};
+        }
 
     }
 }
@@ -157,7 +198,6 @@ const ghostJump = {
 
     draw: function() {
         if(ghostIntro.x == 510){
-        ghostIntro.draw =  function(){};
         let ghostJump = this.animation[this.frame];
         if(this.frame < 3) 
          {ctx.drawImage(sprite, ghostJump.sX, ghostJump.sY, this.w, this.h, this.x , this.y, this.w, this.h)}
@@ -189,7 +229,7 @@ const ghostJump = {
     ,
     intro: function() {
         if(ghostIntro.x == 510){
-        if (this.x ==511)jumpy.play();
+        if (this.x ==511)playSample();
             if(this.frame < 9){
                 this.frame += frames % 12 == 0 ? 1:0;
                 this.frame = this.frame;
@@ -219,6 +259,7 @@ const ghostFall = {
     frame: 0,
 
     draw: function() {
+        
             if(ghostJump.y == 30){
             ghostJump.draw =  function(){};
 
@@ -231,7 +272,7 @@ const ghostFall = {
         ghostJump.draw =  function(){};
         this.frame += frames% 5 == 0 ?1:0;
         this.frame = this.frame % this.animation.length
-        this.y += frames% 1 == 0 ?1:0;
+        this.y += frames% 1 == 0 ?2:0;
         this.y = this.y;
         if(this.y > 245){this.y = 245}}},
     
@@ -240,16 +281,24 @@ const ghostFall = {
 }
 
 const ghostFall2 = {
-
+    
     flap : function (){
-        this.speed = -this.jump
-        jumpy2.play();
+        this.speed = -this.jump;
       } ,
+
+
+
+    animation2: [ 
+        {sX:2141, sY:195}
+    ],
 
     animation: [ 
         {sX:1941, sY:202},
         {sX:1753, sY:202},
     ],
+
+    cW : 226,
+    cH : 180,
 
     x : 624,
     y : 245,
@@ -261,45 +310,68 @@ const ghostFall2 = {
     gravity : 0.25,
     jump : 6,
 
-
-
     draw: function() {
             if(ghostFall.y == 245){
+            state.current = state.game
             let ghostFall2 = this.animation[this.frame];
             ctx.drawImage(sprite, ghostFall2.sX, ghostFall2.sY, this.w, this.h, this.x, this.y, this.w, this.h)
     }},
 
     update: function(){
-        if(ghostFall.y == 245){
+        if(state.current == state.game){
         ghostFall.draw =  function(){}
         this.frame += frames% 5 == 0 ?1:0;
         this.frame = this.frame % this.animation.length
         this.speed += this.gravity;
         this.y += this.speed;
-        if(this.y > 245) {this.y = 245}
-        console.log(cvs.height)
+        if(this.y > 245) {this.y = 245};
+        if(this.y < -100) {this.y = -100}
 }},
+
+    
+
+    chute: async function(){
+        if(this.speed < 0) {
+        this.animation = this.animation2;
+        this.w = this.cW;
+        this.h = this.cH;
+        setTimeout(()=>{
+        this.animation =  [ 
+            {sX:1941, sY:202},
+            {sX:1753, sY:202},
+        ];
+        this.w = 185;
+        this.h = 194;
+        }, 500 )
+
+    }
+    }
 
 
 }
 
 //PARACHUTE OBJ
 
-const ghostChute = {
-    sX : 2141,
-    sY : 195,
-    w : 226,
-    h : 180,
-    x : 630,
-    y : 250,
-    draw: function() {
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
-    }
+// const ghostChute = {
+//     sX : 2141,
+//     sY : 195,
+//     w : 226,
+//     h : 180,
+//     x : ghostFall2.x,
+//     y : ghostFall2.y,
+    
 
-}
+
+//     chute: function(){ 
+//             ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)    
+        
+        
+
+//     }
+
+// }
 
 // GAME START OBJ
-
 const gameStart = {
     sX : 1947,
     sY : 453,
@@ -311,6 +383,8 @@ const gameStart = {
         if(state.current == state.getReady){
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
     }}
+
+
 
 }
 
@@ -386,7 +460,6 @@ const eat1 = {
 
     // REVISIT THIS IF CAUSE YOU WANT YOUR SIDESCROLL LOOP TO START AFTER GHOST REACHES A CERTAIN Y VALUE
         if(!(fg.y < 65)) return;
-        console.log(fg.y)
         
         if(frames%500 == 0){
             this.position.push({
@@ -441,7 +514,6 @@ function draw(){
     ghostFall.draw();
     eat1.draw();
     ghostFall2.draw();
-    // ghostChute.draw();
     gameStart.draw();
     gameOver.draw();
     // gamePannel.draw();
@@ -457,11 +529,11 @@ function intro(){
 
 // UPDATE 
 function update(){
-    ghostFall.update()
+    ghostFall.update();
     ghostFall2.update();
-    fg.update()
-    eat1.update()
-
+    fg.update();
+    eat1.update();
+    bg.update();
 }
 
 //LOOP
