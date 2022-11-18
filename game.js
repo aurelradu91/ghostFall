@@ -47,7 +47,7 @@ let frames = 0;
 // LOAD SPRITE IMG
 
 const sprite = new Image();
-sprite.src = "img/sprite.png";
+sprite.src = "img/sprite2 - Copy.png";
 
 //GAME STATE
 
@@ -282,6 +282,7 @@ const ghostFall = {
 
 const ghostFall2 = {
     
+
     flap : function (){
         this.speed = -this.jump;
       } ,
@@ -438,8 +439,7 @@ const eat1 = {
     animation2: [ 
         {sX:837, sY:1069},
         {sX:1117, sY:1069},
-        {sX:1415, sY:1069},
-        {sX:291, sY:1069},
+        {sX:1415, sY:1069}
     ],
 
     w: 267,
@@ -456,9 +456,21 @@ const eat1 = {
     }},
 
 
+    eyesOpen: function() {
+        let meta = Math.random();
+        if (meta > 0.6){
+        
+        if(state.current == state.game){
+        this.frame += frames % 15 == 0 ? 1:0;
+        this.frame = this.frame % this.animation.length;
+        }}
+
+    },
+
+
     update: function(){
 
-    // REVISIT THIS IF CAUSE YOU WANT YOUR SIDESCROLL LOOP TO START AFTER GHOST REACHES A CERTAIN Y VALUE
+   
         if(!(fg.y < 65)) return;
         
         if(frames%500 == 0){
@@ -468,13 +480,26 @@ const eat1 = {
         }
         for(let i = 0; i < this.position.length; i++){
             let p = this.position[i];
-            
-            
-            
+
+            if( this.h + p.y > ghostFall2.y && 
+                this.h + p.y < ghostFall2.y + ghostFall2.h &&
+                this.frame == 2) 
+                {
+                    this.animation = this.animation2;
+                    p.y = p.y;
+                    ghostFall2.draw = function (){};} else {p.y -= this.dY};
+                    
             // MOVE THE CREATURE UP
-            p.y -= this.dY;
+
             
-            // if the pipes go beyond canvas, we delete them from the array
+            
+            
+            //MAKE THE OLD CREATURE DISSAPPEAR
+            if(p.y + this.h <= 0){
+                this.position.shift();
+            }
+            
+
         }
         }
     }
@@ -534,6 +559,7 @@ function update(){
     fg.update();
     eat1.update();
     bg.update();
+    eat1.eyesOpen();
 }
 
 //LOOP
