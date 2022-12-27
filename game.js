@@ -10,6 +10,7 @@ const actx = new AudioContext()
 
 const stepsfx = new Audio();
 stepsfx.src = "./audio/steps.wav";
+localStorage.setItem("sound", stepsfx)
 
 
 //SOUND FX JUMPS
@@ -428,6 +429,8 @@ const gamePannel = {
 // EAT1 OBJ
 
 const eat1 = {
+    c: 1,
+    boa : 1,
     position: [],
     animation: [ 
         {sX:18, sY:1069},
@@ -438,7 +441,12 @@ const eat1 = {
 
     animation2: [ 
         {sX:837, sY:1069},
+        {sX:837, sY:1069},
+        {sX:565, sY:1069},
+        {sX:837, sY:1069},
         {sX:1117, sY:1069},
+        {sX:1117, sY:1069},
+        {sX:1415, sY:1069},
         {sX:1415, sY:1069}
     ],
 
@@ -447,11 +455,34 @@ const eat1 = {
     x : 550,
     dY: 2,
     frame: 0,
+    mink: 0,
+    cheet: 0,
+
+
 
     draw: function() {
         for(let i  = 0; i < this.position.length; i++){
-        let p = this.position[i];
-        let eat1 = this.animation[this.frame];
+            let p = this.position[i];
+            let beet = this.animation;
+        if (this.boa == 2 && this.position[i] == this.position[0]) {
+            this.eyesOpen = function() {};
+            beet = this.animation2;
+            this.cheet += frames % 5 == 0 ? 1:0;
+            if (this.cheet == 6){ ghostFall2.draw = function (){}; }
+            if (this.cheet > 7){this.cheet = 7}
+            this.frame = this.cheet
+        }
+        if (this.boa == 2 && this.position[i] == this.position[1]) {
+            beet = this.animation;
+          this.mink += frames % 20 == 0 ? 1:0;
+          this.mink = this.mink % this.animation.length;
+          this.frame = this.mink
+          
+        }      
+        console.log(this.cheet)
+        console.log(this.mink)
+        
+        let eat1 = beet[this.frame];
         ctx.drawImage(sprite, eat1.sX, eat1.sY, this.w, this.h, this.x, p.y, this.w, this.h)
     }},
 
@@ -468,65 +499,67 @@ const eat1 = {
     },
 
 
-    update: function(){
 
+
+    update: function(){
+        
    
         if(!(fg.y < 65)) return;
         
-        if(frames%500 == 0){
+        if(frames%250 == 0 && this.boa == 1){
             this.position.push({
                 y : cvs.height,
             });
         }
+
         for(let i = 0; i < this.position.length; i++){
             let p = this.position[i];
 
-            if( this.h + p.y > ghostFall2.y && 
-                this.h + p.y < ghostFall2.y + ghostFall2.h &&
+
+            if( this.h + p.y > ghostFall2.y -20 && 
+                this.h + p.y < ghostFall2.y + ghostFall2.h + 70 &&
                 this.frame == 2) 
-                {
-                    this.animation = this.animation2;
-                    p.y = p.y;
-                    ghostFall2.draw = function (){};} else {p.y -= this.dY};
-                    
-            // MOVE THE CREATURE UP
+                {   
 
-            
-            
-            
-            //MAKE THE OLD CREATURE DISSAPPEAR
-            if(p.y + this.h <= 0){
+                    ghostFall2.flap = function () {};
+                    playSample = function (){};
+                    ghostFall2.y = p.y - 10
+                    ghostFall2.update = function (){};
+                    this.eyesOpen = function () {    
+                    };
+                    this.boa = 2
+                
+                }
+
+                //MAKE THE OLD CREATURE DISSAPPEAR
+                if(p.y + this.h <= 0){
                 this.position.shift();
-            }
+                }
+
+                switch (this.boa) {
+                    case 1:
+                    p.y -= this.dY;;
+                      break;
+                    case 2:
+                    p.y = p.y;
+                      break;
+                  }}
+
+        },
+
+        // newanimation: function() {
+
+        //     if (this.boa == 2) {
+                
+
+
             
 
-        }
-        }
+        //     }}
+        
     }
 
 
-
-
-// EAT2 OBJ
-
-
-// const eat2 = {
-
-
-//     x : 550,
-//     y : 520,
-//     w: 295    ,
-//     h : 181    ,
-
-//     frame: 0,
-
-//     draw: function() {
-//         let eat2 = this.animation[this.frame];
-//         ctx.drawImage(sprite, eat2.sX, eat2.sY, this.w, this.h, this.x, this.y, this.w, this.h)
-//     }
-// }
-
-//
 
 
 function draw(){
@@ -560,6 +593,7 @@ function update(){
     eat1.update();
     bg.update();
     eat1.eyesOpen();
+    // eat1.newanimation();
 }
 
 //LOOP
