@@ -51,10 +51,10 @@ app.get('/search/:name', (request, response) => {
     const db = DbService.getDbServiceInstance();
     const result = db.searchByName(name);
     
-    result
-    .then(data => response.json({data : data}))
-    .catch(err => console.log(err));
-})
+        result
+        .then(data => response.json({data : data}))
+        .catch(err => console.log(err));
+    })
 
 
 app.listen(process.env.PORT, () => console.log('app is running'));

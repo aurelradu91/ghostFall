@@ -66,11 +66,11 @@ class DbService {
         try {
             const response = await new Promise((resolve, reject) => {
 
-                const query = "SELECT * FROM names WHERE name LIKE '?%';";
+                const query = "SELECT * FROM names WHERE name LIKE ? ESCAPE '$';";
 
                 
 
-                connection.query(query, ['name'], (err, results) => {
+                connection.query(query, [`%$${name}%`], (err, results) => {
                     if (err) reject(new Error(err.message));
                     resolve(results);
                 })
